@@ -5,11 +5,10 @@ ENV TZ=UTC
 
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y \
   git \
-  syslog-ng \
+  rsyslog \
   locales \
   cron \
-  python3-mysql.connector \
-  fail2ban \
+  pip \
   opendkim \
   opendkim-tools \
   iptables \
@@ -20,6 +19,8 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y \
   dovecot-lmtpd \
   dovecot-mysql \
   dovecot-pop3d
+
+RUN pip install mysql-connector-python --break-system-packages
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 ENV LANG=en_US.UTF-8
@@ -35,10 +36,12 @@ RUN mkdir -p /etc/letsencrypt/live && \
   chmod 700 /etc/letsencrypt/live && \
   mkdir -p /etc/opendkim/keys
 
-VOLUME ["/var/mail/vhosts", "/var/lib/fail2ban", "/var/log/external"]
+VOLUME ["/var/mail/vhosts", "/var/log/external"]
 
 EXPOSE 25 465 587 993 995
 
-COPY ./start.sh /start.sh
+COPY ./docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
 
-ENTRYPOINT [ "/start.sh" ]
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+CMD [ "/app/start.sh" ]

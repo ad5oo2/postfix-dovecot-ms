@@ -1,0 +1,11 @@
+/var/log/external/*.log {
+    weekly
+    rotate 8
+    compress
+    missingok
+    notifempty
+    sharedscripts
+    postrotate
+        systemctl kill -s HUP rsyslog.service
+    endscript
+}

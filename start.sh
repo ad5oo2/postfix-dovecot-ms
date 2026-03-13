@@ -1,27 +1,20 @@
 #!/bin/bash
 
-git clone https://github.com/ad5oo2/postfix-dovecot-ms /root
-
 echo $MAIL_HOST_NAME > /etc/mailname
 
-### syslog
-echo "SYSLOGNG_OPTS=\"--no-caps\"" >> /etc/default/syslog-ng
-if [[ -e /var/run/syslog-ng.pid ]]; then
-    rm /var/run/syslog-ng.pid
-fi
-sed -i -E "s/^@version:\s.+$/@version: 3.35/g" /etc/syslog-ng/syslog-ng.conf
-sed -i "s/\/var\/log\/mail/\/var\/log\/external\/mail/g" /etc/syslog-ng/syslog-ng.conf
-sed -i -E "s/(mail\..+\")/\1 perm\(0644\)/g" /etc/syslog-ng/syslog-ng.conf
-## /syslog
+### rsyslog
+cp /app/templates/logs/10-mail-rsyslog.conf /etc/rsyslog.d
+cp /app/templates/logs/external-logrotate /etc/logrotate.d
+## /rsyslog
 
 ### quota warning
-cp /root/templates/quota-warning.sh /usr/local/bin
+cp /app/templates/quota-warning.sh /usr/local/bin
 chmod 770 /usr/local/bin/quota-warning.sh
 chown vmail:dovecot /usr/local/bin/quota-warning.sh
 ## /quota warning
 
 ### dovecot
-cp -r /root/templates/dovecot/* /etc/dovecot
+cp -r /app/templates/dovecot/* /etc/dovecot
 
 DOVECOT_SSL="ssl_cert = <\/etc\/letsencrypt\/live\/$MAIN_DOMAIN\/fullchain.pem\r\n\
 ssl_key = <\/etc\/letsencrypt\/live\/$MAIN_DOMAIN\/privkey.pem\r\n\r\n"
@@ -50,7 +43,7 @@ chmod -R o-rwx /etc/dovecot
 ### / dovecot
 
 ### postfix
-cp -r /root/templates/postfix/* /etc/postfix
+cp -r /app/templates/postfix/* /etc/postfix
 find /etc/postfix -type f -exec sed -i "s/%%MAIL_HOST_NAME%%/$MAIL_HOST_NAME/g" {} \+
 find /etc/postfix -type f -exec sed -i "s/%%MAIN_DOMAIN%%/$MAIN_DOMAIN/g" {} \+
 find /etc/postfix -type f -exec sed -i "s/%%MYSQL_USER%%/$MYSQL_USER/g" {} \+
@@ -70,9 +63,13 @@ postmap -F hash:/etc/postfix/vmail_ssl.map
 postmap hash:/etc/postfix/access
 
 chmod -R o-rwx /etc/postfix
+
+cp /etc/resolv.conf /var/spool/postfix/etc/resolv.conf
 ### / postfix
 
 ### opendkim
+cp -r /app/templates/opendkim/* /etc/opendkim
+
 for DOMAIN in $DOMAINS
 do
 	echo "mail._domainkey.$DOMAIN $DOMAIN:mail:/etc/opendkim/keys/$DOMAIN.private" >> /etc/opendkim/KeyTable
@@ -81,34 +78,24 @@ do
 	echo "$DOMAIN" >> /etc/opendkim/TrustedHosts
 done
 
-chown opendkim:opendkim -R /etc/opendkim
 chmod 700 /etc/opendkim
 mv /etc/opendkim/opendkim.conf /etc
-find /etc/opendkim/keys -type f -name "*private*" -exec chmod 400 {} \+
 
 if [[ -e /run/opendkim/opendkim.pid ]]; then
   rm /run/opendkim/opendkim.pid
 fi
 ### /opendkim
 
-### fail2ban
-rm /var/run/fail2ban/*
-cp -r /root/templates/fail2ban/* /etc/fail2ban
-### /fail2ban
-
 ### cron
-rm /etc/cron.d/*
-rm /etc/cron.daily/*
-env > /etc/crontab
-cat /root/configmap_cron >> /etc/crontab
-cp /root/templates/remover.py /usr/local/bin
+cp /etc/crontab /root
+env|grep ^MYSQL_ > /etc/crontab
+env|grep ^MAILDIR >> /etc/crontab
+echo -e "\n\n$CRONTAB" >> /etc/crontab
+cp /app/templates/remover.py /usr/local/bin
 ### /cron
 
+/usr/sbin/rsyslogd
 service cron start
-service syslog-ng start
-service fail2ban start
-chmod 644 /var/log/external/fail2ban.log
 service opendkim start
 service dovecot start
-cp /etc/resolv.conf /var/spool/postfix/etc/resolv.conf
 postfix start-fg
