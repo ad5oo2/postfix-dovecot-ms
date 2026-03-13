@@ -1,0 +1,20 @@
+[DEFAULT]
+bantime = 12h
+findtime  = 30m
+maxretry = 3
+ignoreip = 127.0.0.1/8 192.168.0.0/16 10.0.0.0/8 172.16.0.0/12
+
+[sshd]
+enabled = false
+
+[postfix-sasl]
+enabled	= true
+filter	= postfix-sasl
+port	= smtp,465,submission,imap,imaps,pop3,pop3s
+logpath	= /var/log/external/mail.log
+
+[dovecot]
+enabled	= true
+filter	= dovecot
+port	= imap,imaps,pop3,pop3s
+logpath	= /var/log/external/mail.log

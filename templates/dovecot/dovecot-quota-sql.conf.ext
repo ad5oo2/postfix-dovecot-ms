@@ -1,0 +1,15 @@
+connect = host=%%MYSQL_SERVER%% dbname=%%MYSQL_DB%% user=%%MYSQL_USER%% password=%%MYSQL_PASSWORD%%
+
+map {
+  pattern = priv/quota/storage
+  table = virtual_users
+  username_field = email
+  value_field = bytes
+}
+
+map {
+  pattern = priv/quota/messages
+  table = virtual_users
+  username_field = email
+  value_field = messages
+} 

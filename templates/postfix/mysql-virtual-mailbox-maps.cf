@@ -1,0 +1,5 @@
+user = %%MYSQL_USER%%
+password = %%MYSQL_PASSWORD%%
+hosts = %%MYSQL_SERVER%%
+dbname = %%MYSQL_DB%%
+query = SELECT 1 FROM virtual_users LEFT JOIN virtual_domains ON virtual_users.domain_id = virtual_domains.id WHERE virtual_domains.active = 1 AND virtual_users.active = 1 AND virtual_users.email='%s'

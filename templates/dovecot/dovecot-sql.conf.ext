@@ -1,0 +1,6 @@
+driver = mysql
+connect = host=%%MYSQL_SERVER%% dbname=%%MYSQL_DB%% user=%%MYSQL_USER%% password=%%MYSQL_PASSWORD%%
+default_pass_scheme = SHA512-CRYPT
+
+user_query = SELECT '/var/spool/mail/vhosts/%d/%n' AS home, 'maildir:/var/spool/mail/vhosts/%d/%n' AS mail, 5000 AS uid, 5000 AS gid, concat('*:bytes=', quota*1024*1204) AS quota_rule FROM virtual_users LEFT JOIN virtual_domains ON virtual_users.domain_id = virtual_domains.id WHERE virtual_domains.active = 1 AND virtual_users.active = 1 AND virtual_users.email='%u'
+password_query = SELECT virtual_users.email AS user, virtual_users.password AS password FROM virtual_users LEFT JOIN virtual_domains ON virtual_users.domain_id = virtual_domains.id WHERE virtual_domains.active = 1 AND virtual_users.active = 1 AND virtual_users.email='%u'

@@ -1,0 +1,11 @@
+connect = host=%%MYSQL_SERVER%% dbname=%%MYSQL_DB%% user=%%MYSQL_USER%% password=%%MYSQL_PASSWORD%%
+
+map {
+  pattern = shared/last-login/$user
+  table = virtual_users
+  username_field = email
+  value_field = last_login
+  fields {
+    email = $user
+  }
+}

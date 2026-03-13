@@ -1,0 +1,2 @@
+
+05 12 * * * root python3 /usr/local/bin/remover.py > /dev/null 2>&1

@@ -1,0 +1,2 @@
+[DEFAULT]
+logtarget = /var/log/external/fail2ban.log
