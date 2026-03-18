@@ -6,6 +6,7 @@
 #myorigin = /etc/mailname
 
 postscreen_upstream_proxy_protocol = haproxy
+smtpd_upstream_proxy_protocol = haproxy
 
 smtpd_banner = $myhostname ESMTP
 biff = no
