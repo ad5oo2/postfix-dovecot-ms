@@ -2,6 +2,10 @@
 
 echo $MAIL_HOST_NAME > /etc/mailname
 
+chown vmail:vmail /var/spool/mail/vhosts
+chown syslog:vmail -R /var/log/external
+chmod 770 /var/log/external /var/spool/mail/vhosts
+
 ### rsyslog
 cp /app/templates/logs/10-mail-rsyslog.conf /etc/rsyslog.d
 cp /app/templates/logs/external-logrotate /etc/logrotate.d
