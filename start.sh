@@ -69,6 +69,10 @@ cp /etc/resolv.conf /var/spool/postfix/etc/resolv.conf
 
 ### opendkim
 cp -r /app/templates/opendkim/* /etc/opendkim
+mkdir /etc/opendkim/keys
+chmod 700 /etc/opendkim/keys
+cp /etc/opendkim/mounted_keys/*.private /etc/opendkim/keys
+chmod 700 /etc/opendkim/keys/*
 
 for DOMAIN in $DOMAINS
 do
@@ -79,6 +83,8 @@ do
 done
 
 chmod 700 /etc/opendkim
+chown -R opendkim:opendkim /etc/opendkim
+
 mv /etc/opendkim/opendkim.conf /etc
 
 if [[ -e /run/opendkim/opendkim.pid ]]; then
