@@ -78,7 +78,7 @@ chmod 700 /etc/opendkim/keys
 cp /etc/opendkim/mounted_keys/*.private /etc/opendkim/keys
 chmod 700 /etc/opendkim/keys/*
 
-for DOMAIN in $DOMAINS
+for DOMAIN in $DKIM_DOMAINS
 do
 	echo "mail._domainkey.$DOMAIN $DOMAIN:mail:/etc/opendkim/keys/$DOMAIN.private" >> /etc/opendkim/KeyTable
 	echo "*@$DOMAIN mail._domainkey.$DOMAIN" >> /etc/opendkim/SigningTable
