@@ -107,7 +107,8 @@ fi
 cp /etc/crontab /root
 env|grep ^MYSQL_ > /etc/crontab
 env|grep ^MAILDIR >> /etc/crontab
-echo -e "\n\n$CRONTAB" >> /etc/crontab
+env|grep ^DKIM_DOMAINS >> /etc/crontab
+echo -e "\n$CRONTAB" >> /etc/crontab
 cp /app/templates/remover.py /usr/local/bin
 ### /cron
 
