@@ -17,7 +17,14 @@ chmod 770 /usr/local/bin/quota-warning.sh
 chown vmail:dovecot /usr/local/bin/quota-warning.sh
 ## /quota warning
 
+### quota updater
+cp /app/templates/quota-update.sh /usr/local/bin
+chmod 770 /usr/local/bin/quota-update.sh
+chown vmail:dovecot /usr/local/bin/quota-update.sh
+## /quota updater
+
 ### dovecot
+rm -rf /etc/dovecot/*
 cp -r /app/templates/dovecot/* /etc/dovecot
 
 DOVECOT_SSL="ssl_cert = <\/etc\/letsencrypt\/live\/$MAIN_DOMAIN\/fullchain.pem\r\n\
