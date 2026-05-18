@@ -1,11 +1,13 @@
 /var/log/external/*.log {
+    su syslog vmail
     weekly
-    rotate 8
+    rotate 16
     compress
     missingok
     notifempty
+    create 0640 syslog vmail
     sharedscripts
     postrotate
-        systemctl kill -s HUP rsyslog.service
+        pkill -HUP rsyslogd
     endscript
 }
